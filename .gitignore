@@ -1,12 +1,66 @@
-.env
+# Python environments and caches
 .venv/
-.venv-manufacturer/
+.venv-*/
+venv/
 __pycache__/
 *.py[cod]
-vehicle/media/
-vehicle/private-audits/
-vehicle/db.sqlite3
-local_output/
-test_output/
-models/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# Private configuration (keep shareable templates)
+.env
+.env.*
+!.env.example
+!.env.template
 *.local.json
+
+# Node dependencies and generated frontend bundles
+node_modules/
+dist/
+.vite/
+
+# Run artifacts, uploaded recordings and private delivery credentials
+/pipeline/vehicle/media/
+/pipeline/vehicle/private-audits/
+/pipeline-uploads/
+/vehicle/media/
+/vehicle/private-audits/
+/local_output/
+/test_output/
+/pipeline/local_output/
+/pipeline/test_output/
+.waycon-gpu.lock
+*.log
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.rdb
+*.aof
+appendonlydir/
+
+# Model downloads and native binary packages (see README setup instructions)
+models/
+*.pt
+*.pth
+*.onnx
+*.gguf
+*.safetensors
+*.pdiparams
+*.whl
+
+# Downloaded Redis distribution and vendored DINOv3 checkout
+/pipeline/vehicle/recognition/plate/license_plate_plugin/assets/vendor/dinov3/
+
+# Local editor and operating-system metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
