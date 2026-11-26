@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "waycon:proposal:manufacturer-delivery-v1",
+  "title": "DRAFT manufacturer closure branch v1 (PROPOSAL, NOT APPROVED, NOT LOADED)",
+  "description": "Proposed versioned replacement for the closure field `manufacturer: {enum:[unsupported]}` in vehicle_plate_requests_v2 / vehicle_redis_plate_v1 / vehicle_redis_scalar_v1. Activation requires the supervisor approvals in docs/t1/manufacturer_quality_runtime.md (model registration, brand catalogue mapping, emission policy, ts/observations semantics, confidence policy) and a new codec/natural-bundle version. No runtime path reads this file.",
+  "x-status": "proposal_not_approved",
+  "oneOf": [
+    {"const": "unsupported"},
+    {"$ref": "#/$defs/enabled_branch"}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "count": {"type": "integer", "minimum": 0},
+    "receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["frame_index", "ts", "monotonic", "media_pts"],
+      "properties": {
+        "frame_index": {"type": "integer", "minimum": 0},
+        "ts": {"type": "string"},
+        "monotonic": {"type": "number", "minimum": 0},
+        "media_pts": {"type": ["number", "null"]}
+      }
+    },
+    "selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy", "config_sha256", "observed", "eligible", "rejected", "selected", "submission"],
+      "properties": {
+        "policy": {"const": "quality_lifetime_v1"},
+        "config_sha256": {"$ref": "#/$defs/sha256"},
+        "observed": {"$ref": "#/$defs/count"},
+        "eligible": {"$ref": "#/$defs/count"},
+        "rejected": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+        "selected": {"type": ["object", "null"]},
+        "submission": {"enum": ["submitted", "none_eligible", "not_observed", "stopped_before_submission"]}
+      }
+    },
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["vehicle", "receipt", "bbox", "shape", "crop_sha256", "frame_sha256", "provenance"],
+      "properties": {
+        "vehicle": {"type": "object"},
+        "receipt": {"oneOf": [{"$ref": "#/$defs/receipt"}, {"type": "null"}]},
+        "bbox": {"type": "array", "maxItems": 4, "items": {"type": "integer", "minimum": 0}},
+        "shape": {"type": "array", "maxItems": 3, "items": {"type": "integer", "minimum": 1}},
+        "crop_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "frame_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "provenance": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "selection": {"$ref": "#/$defs/selection"}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["binding", "request_id", "outcome", "text", "seconds"],
+      "properties": {
+        "binding": {"$ref": "#/$defs/binding"},
+        "request_id": {"$ref": "#/$defs/sha256"},
+        "outcome": {"enum": ["completed", "timed_out", "failed", "execution_uncertain", "disabled", "unknown", "cancelled"]},
+        "text": {"type": "string", "maxLength": 2048},
+        "seconds": {"type": "number", "minimum": 0, "maximum": 65}
+      }
+    },
+    "enabled_branch": {
+      "type": "object", "additionalProperties": false,
+      "required": ["capability", "evidence_version", "evidence"],
+      "properties": {
+        "capability": {"const": "enabled"},
+        "evidence_version": {"const": "manufacturer-evidence-v2"},
+        "evidence": {"$ref": "#/$defs/evidence"}
+      }
+    }
+  }
+}

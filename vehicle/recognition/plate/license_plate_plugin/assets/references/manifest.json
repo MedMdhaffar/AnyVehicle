@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen reviewed reference collection for the extracted R2 plus NT OCR classifier.",
+  "coordinate_convention": "Complete plate crops; marker boxes and registration metadata are not used by this plugin.",
+  "physical_independence": "Unverified; physical_plate_id and group_id remain null.",
+  "source_manifest": "all_plate_manifest.json",
+  "source_manifest_sha256": "d7f68deddf2ff302e4d8dd04a3ad56b1519f2869ecf74c8a24daa2ed25a92910",
+  "images": [
+    {
+      "id": "1",
+      "path": "images/1.png",
+      "source_project_path": "plates/idara/1.png",
+      "category": "idara",
+      "registration": "17 - 138957",
+      "expected_width": 680,
+      "expected_height": 159,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "4bc69f7b6e0fb6a200109bfa45cd48ed30e971395a27c20fc76e406cd252cc38"
+    },
+    {
+      "id": "2",
+      "path": "images/2.png",
+      "source_project_path": "plates/idara/2.png",
+      "category": "idara",
+      "registration": "17 - 148885",
+      "expected_width": 650,
+      "expected_height": 203,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "53cccd1ddcc6f0c70c90bf66ea4019e65ba2f79633439c3812ef8701a959c6f1"
+    },
+    {
+      "id": "3",
+      "path": "images/3.png",
+      "source_project_path": "plates/idara/3.png",
+      "category": "idara",
+      "registration": "17 - 138956",
+      "expected_width": 800,
+      "expected_height": 159,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "3598db2a3b98103ece19c78cdd066c35b5b6d8f36d0a345d34465a88f7290999"
+    },
+    {
+      "id": "8",
+      "path": "images/8.png",
+      "source_project_path": "plates/shorta/8.png",
+      "category": "shorta",
+      "registration": "14330",
+      "expected_width": 132,
+      "expected_height": 39,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "2bdf3980effb34ba2b539be56511a7af64975eae0b3508fdd2028752e8209d32"
+    },
+    {
+      "id": "9",
+      "path": "images/9.png",
+      "source_project_path": "plates/shorta/9.png",
+      "category": "shorta",
+      "registration": "27211",
+      "expected_width": 157,
+      "expected_height": 44,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "7f479012a8417a028939461b4d82d1f86113a78c1ccd4e8d52eb70686a97d5ba"
+    },
+    {
+      "id": "10",
+      "path": "images/10.png",
+      "source_project_path": "plates/tunis/10.png",
+      "category": "tunis",
+      "registration": "150 9603",
+      "expected_width": 420,
+      "expected_height": 132,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "2c9d1965d542093d681a40fc48c0bebe0e7f754a5d0a936720808e4734231be8"
+    },
+    {
+      "id": "11",
+      "path": "images/11.png",
+      "source_project_path": "plates/tunis/11.png",
+      "category": "tunis",
+      "registration": "122 937",
+      "expected_width": 168,
+      "expected_height": 54,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "1d5a13afcc92d955fd0df87734267b9e17d4f52c869cb8a2db295f714f062925"
+    },
+    {
+      "id": "12",
+      "path": "images/12.png",
+      "source_project_path": "plates/tunis/12.png",
+      "category": "tunis",
+      "registration": "105 395",
+      "expected_width": 244,
+      "expected_height": 61,
+      "physical_plate_id": null,
+      "group_id": null,
+      "sha256": "6577a657626fbe46c242cd33bc1adbce0f7f23d20c1711d26247275177a50c28"
+    }
+  ]
+}

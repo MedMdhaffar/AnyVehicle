@@ -1,0 +1,119 @@
+from __future__ import annotations
+
+import logging
+import re
+import statistics
+import unicodedata
+from pathlib import Path
+import os
+from dataclasses import dataclass
+
+import numpy as np
+import vehicle.recognition.plate.config as config
+
+log = logging.getLogger(__name__)
+
+
+def normalize_digits(text: str) -> str:
+    return "".join(str(unicodedata.decimal(c)) if c.isdecimal() else c for c in (text or ""))
+
+
+def normalize_plate_text(text: str) -> str:
+    """Preserve category words, digits and uncertain letters; normalize separators only."""
+    return re.sub(r"\s+", " ", normalize_digits(unicodedata.normalize("NFKC", text or ""))).strip().upper()
+
+
+def digits_only(text: str) -> str:
+    return "".join(c for c in normalize_digits(text) if c in "0123456789")
+
+
+@dataclass(frozen=True)
+class OCRResult:
+    raw_text: str
+    normalized_text: str
+    confidence: float
+    native_confidence: float | None = None
+
+
+class PlateReader:
+    """Thin wrapper around native PaddleOCR PP-OCRv6 text recognition.
+    read(crop) -> (digits_text, mean_confidence).
+    """
+
+    def __init__(self, rec_model: str = config.OCR_REC_MODEL, *, configuration=config):
+        
+        device = os.environ.get("REGISTRATION_OCR_DEVICE", "gpu:0")
+
+        import paddle
+
+        if not device.startswith("gpu:") or not device[4:].isdigit():
+            raise RuntimeError("Registration OCR requires a gpu:<index> device; CPU execution is disabled.")
+        if not paddle.is_compiled_with_cuda() or int(device[4:]) >= paddle.device.cuda.device_count():
+            raise RuntimeError("Registration OCR requires CUDA-enabled Paddle and an available GPU; CPU fallback is disabled.")
+        self.rec_model = rec_model
+
+        model_dir = configuration.REGISTRATION_OCR_MODEL_DIR
+
+        if not model_dir.is_absolute():
+            raise RuntimeError(
+                f"REGISTRATION_OCR_MODEL_DIR must be absolute: {model_dir}"
+            )
+
+        required = ("inference.json", "inference.pdiparams", "inference.yml")
+        missing = [name for name in required if not (model_dir / name).is_file()]
+
+        if missing:
+            raise RuntimeError(
+                f"OCR model files missing in {model_dir}: {', '.join(missing)}"
+            )   
+         
+        
+        import yaml
+        identity = yaml.safe_load((model_dir / "inference.yml").read_text(encoding="utf-8"))
+        if identity.get("Global", {}).get("model_name") != rec_model:
+            raise RuntimeError(f"Registration OCR assets do not identify {rec_model}")
+        os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
+        from paddleocr import TextRecognition
+        self.engine = TextRecognition(model_name=rec_model, model_dir=str(model_dir.resolve()),
+                                      device=device)
+        log.info("Native PaddleOCR TextRecognition (%s) loaded.", rec_model)
+
+    def _parse(self, out) -> OCRResult:
+        texts, scores = [], []
+        for r in out or []:
+            d = r if isinstance(r, dict) else getattr(r, "json", None) or {}
+            if isinstance(d, dict) and "res" in d and isinstance(d["res"], dict):
+                d = d["res"]
+            if isinstance(d, dict) and "rec_texts" in d:
+                texts += list(d.get("rec_texts", []))
+                scores += list(d.get("rec_scores", []))
+            elif isinstance(d, dict) and ("rec_text" in d or "text" in d):
+                texts.append(d.get("rec_text", d.get("text", "")))
+                scores.append(float(d.get("rec_score", d.get("score", 0.0)) or 0.0))
+            elif isinstance(r, (list, tuple)):
+                for line in r:
+                    try:
+                        texts.append(line[1][0])
+                        scores.append(float(line[1][1]))
+                    except Exception:
+                        pass
+        raw = " ".join(t for t in texts if t)
+        normalized = normalize_plate_text(raw)
+        native_confidence = statistics.mean(scores) if scores else 0.0
+        conf = round(native_confidence, 4)
+        return OCRResult(raw_text=raw, normalized_text=normalized, confidence=conf, native_confidence=native_confidence)
+
+    def read_result(self, crop: np.ndarray) -> OCRResult:
+        if crop is None or crop.size == 0:
+            return OCRResult("", "", 0.0)
+        try:
+            if hasattr(self.engine, "predict"):
+                return self._parse(self.engine.predict(crop))
+            return self._parse(self.engine.ocr(crop))
+        except Exception as exc:
+            raise RuntimeError(f"Registration OCR failed: {exc}") from exc
+
+    def read(self, crop: np.ndarray) -> tuple[str, float]:
+        """Backward-compatible normalized text/confidence API."""
+        result = self.read_result(crop)
+        return result.normalized_text, result.confidence

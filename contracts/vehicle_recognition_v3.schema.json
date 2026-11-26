@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Engine recognition scalar evidence v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "event_id", "body"],
+  "properties": {
+    "schema_version": {"const": "vehicle-recognition-v3"},
+    "kind": {"enum": ["engine.recognition.v3", "db1.delivery.v1"]},
+    "event_id": {"type": "string", "format": "uuid"},
+    "body": {
+      "type": "object", "additionalProperties": false,
+      "required": ["life", "evidence"],
+      "properties": {
+        "life": {"type": "object"},
+        "bundle": {"type": "object"},
+        "evidence": {
+          "type": "object", "additionalProperties": false,
+          "required": ["life", "attributes", "plates", "models", "attributes_enabled"],
+          "properties": {
+            "life": {"type": "object"},
+            "attributes_enabled": {"type": "boolean"},
+            "manufacturer_policy": {"const": "recognized-name-v1"},
+            "models": {"type": "object"},
+            "plate_diagnostics": {
+              "type": "object", "additionalProperties": false,
+              "required": ["detections", "ambiguous"],
+              "properties": {
+                "detections": {"type": "integer", "minimum": 0}, "ambiguous": {"type": "integer", "minimum": 0},
+                "eligible_crops": {"type": "integer", "minimum": 0},
+                "tracker_observations": {"type": "integer", "minimum": 0},
+                "fallback_detector_calls": {"type": "integer", "minimum": 0},
+                "fallback_detections": {"type": "integer", "minimum": 0},
+                "fallback_eligible_crops": {"type": "integer", "minimum": 0},
+                "recovery_ocr_scheduled": {"type": "integer", "minimum": 0},
+                "stopping_stage": {"type": "string"}
+              }
+            },
+            "attributes": {
+              "type": "object",
+              "required": ["manufacturer", "color", "recognition_status", "recognition_evidence"],
+              "properties": {
+                "manufacturer": {"type": "string"}, "color": {"type": "string"},
+                "recognition_status": {"enum": ["disabled", "pending", "recognized", "unknown", "error"]},
+                "recognition_evidence": {
+                  "type": "array", "maxItems": 5,
+                  "items": {"type": "object", "required": ["receipt", "frame_index"],
+                    "properties": {"receipt": {"$ref": "#/$defs/receipt"}, "frame_index": {"type": "integer", "minimum": 0},
+                      "result": {"type": "object", "required": ["manufacturer", "vehicle_type", "color"],
+                        "properties": {"manufacturer": {"type": "string"}, "vehicle_type": {"type": "string"}, "color": {"type": "string"}}}}}
+                }
+              }
+            },
+            "plates": {
+              "type": "array", "maxItems": 128,
+              "items": {"type": "object", "additionalProperties": false,
+                "required": ["ordinal", "plate_track_id", "receipt", "result", "selected", "crop_quality"],
+                "properties": {
+                  "ordinal": {"type": "integer", "minimum": 1}, "plate_track_id": {"type": "integer", "minimum": 0},
+                  "receipt": {"$ref": "#/$defs/receipt"}, "result": {"type": "object"},
+                  "selected": {"type": "boolean"}, "crop_quality": {"type": "number", "minimum": 0}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "receipt": {"type": "object", "additionalProperties": false,
+      "required": ["frame_index", "ts", "monotonic", "media_pts"],
+      "properties": {"frame_index": {"type": "integer", "minimum": 0}, "ts": {"type": "string", "format": "date-time"},
+        "monotonic": {"type": "number"}, "media_pts": {"type": ["number", "null"]}}}
+  }
+}
