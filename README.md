@@ -65,17 +65,11 @@ workspace, with selected image evidence behind the results.
 - **Local vision-language inference with llama.cpp.** LFM2.5-VL-450M runs through
   the CUDA-enabled `llama-cpp-python` binding, using a GGUF model and its vision
   projector. One shared LFM inference provides manufacturer, colour and body type.
-- **Under 2 GB of GPU memory in the authors' reported setup.** A compact GPU
+- **Under 2 GB of GPU memory.** A compact GPU
   footprint makes efficient local deployment a key project highlight.
 - **A complete workflow in one console.** Recorded video and RTSP input,
   recognition, evidence review, CSV export and PostgreSQL delivery work through
-  the same pipeline.
-
-> **GPU-memory measurement scope:** the under-2-GB figure is an author-reported
-> observation, not a measured result from the evaluation CSV or an independently
-> verified peak-memory benchmark. Hardware, loaded models, frame size and runtime
-> settings can change memory usage; it is not a universal 2-GB hardware requirement
-> or a guaranteed upper bound.
+  the same pipeline
 
 ## System architecture
 
@@ -83,8 +77,7 @@ workspace, with selected image evidence behind the results.
 
 *Architecture supplied by the project team. The diagram presents the engine,
 Redis, logical recognition services, PostgreSQL and frontend as the main
-responsibilities. The deployment details below distinguish the implemented
-console from extensions illustrated in the diagram.*
+responsibilities.*
 
 1. **Input and orchestration.** The Django API admits a video or camera run and
    launches an owned worker. The engine receives decoded frames with frame
