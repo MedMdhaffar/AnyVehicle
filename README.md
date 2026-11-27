@@ -44,6 +44,18 @@ results for review and delivery to PostgreSQL.
 | Evidence and evaluation | Selected crops, previews, manual reviews and CSV exports |
 | Delivery and operations | Redis handoffs, database delivery state and controlled Stop |
 
+## See it in action
+
+> **Demo video coming soon.** Watch Any Vehicle turn video into vehicle tracks,
+> plate readings and vehicle attributes in one workspace.
+
+<!-- Replace this placeholder with your video URL when ready.
+For GitHub, upload the video to a GitHub issue or pull request, then paste its
+generated attachment URL here to display an inline video.
+
+VIDEO_URL_HERE
+-->
+
 ## More intelligence. Less GPU memory.
 
 **Follow the vehicle. Read the plate. Recognize the details.** Any Vehicle brings
